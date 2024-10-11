@@ -28,6 +28,10 @@ public class ListenerService {
 
             observation.event(Observation.Event.of("print", "Kafka print data"));
 
+            if (str.equals("exception")) {
+                throw new RuntimeException();
+            }
+
         } catch (Exception ex) {
             observation.error(ex);
             throw ex;
