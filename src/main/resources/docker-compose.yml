@@ -30,6 +30,6 @@ services:
     restart: always
     mem_limit: 512m
     ports:
-      - "2181:2181"
+      - "2182:2181"
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
