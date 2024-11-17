@@ -35,16 +35,11 @@ public class ListenerService {
 
             System.out.println(arrays.size());
 
-            for (GenericArray elm : arrays) {
-                MessageModel model = new MessageModel();
+            MessageModel model = new MessageModel();
 
-                model.setMessage(elm.toString());
+            model.setMessage("data");
 
-                repo.save(model);
-            }
-
-            Optional<List<MessageModel>> optionalMessageModels = repo.findByMessage("data");
-
+            repo.save(model);
 
             observation.event(Observation.Event.of("print", "Kafka print data"));
 
