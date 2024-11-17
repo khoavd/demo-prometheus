@@ -10,6 +10,7 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=dev
       - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=localdb
 
   kafka:
     image: confluentinc/cp-kafka:7.3.1

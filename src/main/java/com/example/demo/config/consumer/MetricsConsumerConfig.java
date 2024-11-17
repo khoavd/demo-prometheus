@@ -15,22 +15,22 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 public class MetricsConsumerConfig {
-    @Bean("metricsListenerFactory")
-    ConcurrentKafkaListenerContainerFactory<String, String>
-    kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory);
-        return factory;
-    }
-
-    @Bean
-    public ConsumerFactory<String, String> consumerFactory(DefaultKafkaConsumerFactoryCustomizer customizer) {
-        DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps());
-        customizer.customize(consumerFactory);
-        return consumerFactory;
-    }
-
+//    @Bean("metricsListenerFactory")
+//    ConcurrentKafkaListenerContainerFactory<String, String>
+//    kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
+//        ConcurrentKafkaListenerContainerFactory<String, String> factory =
+//                new ConcurrentKafkaListenerContainerFactory<>();
+//        factory.setConsumerFactory(consumerFactory);
+//        return factory;
+//    }
+//
+//    @Bean
+//    public ConsumerFactory<String, String> consumerFactory(DefaultKafkaConsumerFactoryCustomizer customizer) {
+//        DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps());
+//        customizer.customize(consumerFactory);
+//        return consumerFactory;
+//    }
+//
     private Map<String, Object> consumerProps() {
         Map<String, Object> props = new HashMap<>();
         props.put(org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -40,4 +40,32 @@ public class MetricsConsumerConfig {
         props.put(org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         return props;
     }
+
+    @Bean
+    public ConsumerFactory<String, Object> genericConsumerFactory(DefaultKafkaConsumerFactoryCustomizer customizer) {
+        Map<String, Object> props = consumerProps();
+
+
+
+        DefaultKafkaConsumerFactory<String, Object> consumerFactory = new DefaultKafkaConsumerFactory<>(props);
+        customizer.customize(consumerFactory);
+        return consumerFactory;
+    }
+
+
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, Object> genericKafkaListenerContainerFactory(ConsumerFactory<String, Object> consumerFactory, KafkaErrorHandler kafkaErrorHandler) {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setBatchListener(true);
+        factory.setCommonErrorHandler(kafkaErrorHandler);
+        factory.setConsumerFactory(consumerFactory);
+
+
+
+        factory.setConsumerFactory(consumerFactory);
+        return factory;
+    }
+
+
 }
