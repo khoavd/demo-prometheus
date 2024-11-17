@@ -26,7 +26,7 @@ public class MongoDBContainer {
         registry.add("spring.data.mongodb.port", MONGO_DB_CONTAINER::getFirstMappedPort);
         registry.add("spring.data.mongodb.username", () -> "test_container");
         registry.add("spring.data.mongodb.username", () -> "test_container");
-        registry.add("spring.data.mongodb.username", () -> "test");
+        registry.add("spring.data.mongodb.authentication-database", () -> "");
         registry.add("spring.data.mongodb.password", () -> "test_container");
         registry.add("spring.data.mongodb.database", () -> "user_management");
     }
