@@ -10,11 +10,12 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
 
 import java.time.Duration;
 import java.util.List;
@@ -34,29 +35,32 @@ import static org.awaitility.Awaitility.await;
 @Testcontainers
 public class ConsumerTest {
 
-//    @Container
-//    static MongoDBContainer mongoDBContainer = new MongoDBContainer(
-//            "mongo:6.0.4").withExposedPorts(27017);
+    @Container
+    public static final GenericContainer<?> MONGO_DB_CONTAINER = new GenericContainer<>(
+            DockerImageName.parse("mongo:6.0.7"))
+            .withExposedPorts(27017)
+            .withCopyFileToContainer(MountableFile.forClasspathResource("init-schema.js"), "/docker-entrypoint-initdb.d/init-schema.js");
+
+    static {
+        MONGO_DB_CONTAINER.start();
+    }
+
 
     @Container
     static final KafkaContainer kafka = new KafkaContainer(
             DockerImageName.parse("confluentinc/cp-kafka:7.3.1")
     );
 
-//    @DynamicPropertySource
-//    static void containersProperties(DynamicPropertyRegistry registry) {
-//        mongoDBContainer.start();
-//        registry.add("spring.data.mongodb.host", mongoDBContainer::getHost);
-//        registry.add("spring.data.mongodb.port", mongoDBContainer::getFirstMappedPort);
-//    }
-
-
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
+
         registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
-        //registry.add("spring.data.mongodb.host", mongoDBContainer::getHost);
-        //registry.add("spring.data.mongodb.port", mongoDBContainer::getFirstMappedPort);
+        registry.add("spring.data.mongodb.host", MONGO_DB_CONTAINER::getHost);
+        registry.add("spring.data.mongodb.port", MONGO_DB_CONTAINER::getFirstMappedPort);
+        registry.add("spring.data.mongodb.username", () -> "test_container");
+        registry.add("spring.data.mongodb.password", () -> "test_container");
+        registry.add("spring.data.mongodb.database", () -> "user_management");
     }
 
     @Autowired
@@ -82,4 +86,7 @@ public class ConsumerTest {
 
                 });
     }
+
+
+
 }
